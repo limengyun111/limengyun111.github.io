@@ -22,7 +22,7 @@ var limengyun111 = {
     return obj => path.reduce((res, item) => res[item], obj)
   },
   matchesProperty: function (path, val) {
-    return obj => obj.isMatch(this.property(path)(obj), val)
+    return obj => isMatch(this.property(path)(obj), val)
   },
 
   isEqual: function (value, other) {
@@ -89,21 +89,9 @@ var limengyun111 = {
       }
     })
   },
-  difference: function (array, [values]) {
-    var result = []
-    var count = 0
-    for (var oval of array) {
-      for (var ival of values) {
-        if (!this.SameValueZero(oval, ival)) {
-          count++
-        }
-      }
-      if (count == values.length) {
-        result.push(oval)
-      }
-      count = 0
-    }
-    return result
+  difference: function (array, ...args) {
+
+    return array.filter(it => !args.flat().includes(it))
   },
   SameValueZero: function (x, y) {
     if (Object.prototype.toString.call(x) !== Object.prototype.toString.call(y)) {
@@ -149,7 +137,7 @@ var limengyun111 = {
   },
   dropRight: function (array, n = 1) {
     array.splice(-n, n)
-    return arrry
+    return array
   },
   dropRightWhile: function (array, predicate) {
     var func = this.iteratee(predicate)
@@ -163,7 +151,129 @@ var limengyun111 = {
     }
     return res
 
-  }
+  },
+  dropWhile: function (array, predicate) {
+    var func = this.iteratee(predicate)
+    var res = array.slice()
+    for (var i = 0; i < array.length; i++) {
+      if (func(array[i])) {
+        res.shift()
+      } else {
+        break
+      }
+    }
+    return res
+  },
+  fill: function (array, value, start = 0, end = array.length) {
+    for (let i = start; i < end; i++) {
+      array[i] = value
+    }
+    return array
+  },
+  findIndex: function (array, predicate, fromIndex = 0) {
+    var func = this.iteratee(predicate)
+    for (let i = fromIndex; i < array.length; i++) {
+      if (func(array[i])) {
+        return i
+      }
+    }
+  },
+  findLastIndex: function (array, predicate, fromIndex = array.length - 1) {
+    var func = this.iteratee(predicate)
+    for (let i = fromIndex; i >= 0; i--) {
+      if (func(array[i])) {
+        return i
+      }
+    }
+  },
+  flatten: function (array,count = 0,result = []) {
+    var result = []
+    for (var i = 0; i < array.length; i++) {
+      if (typeof array[i] === "object") {
+        var innerAry = array[i]
+        for(var j = 0;j < innerAry.length;j++) {
+          result.push(innerAry[j])
+        }
+      }
+      result.push(array[i])
+    }
+    return result
+
+  },
+  flattenDeep:function(array) {
+    return array.map(item => {
+      if(typeof item === "object") {
+        return this.flattenDeep(item)
+      }else {
+        return item
+      }
+    })
+  },
+  fromPairs:function(pairs) {
+    let map = new Map()
+    for(var key of pairs) {
+      map[key[0]] = key[1]
+    }
+    return map
+  },
+  head:function(array) {
+    return array.shift()
+  },
+  indexOf:function(array, value, fromIndex=0) {
+    if(Math.abs(fromIndex) > array.length - 1) {
+      return undefined
+    }else if(Math.abs(fromIndex) == fromIndex) {
+      for(var i = fromIndex;i < array.length;i++) {
+        if(array[i] == value) {
+          return i
+        }
+      }
+    }else {
+      for(var i = array.length + fromIndex;i >= 0;i--) {
+        if(array[i] == value) {
+          return i
+        }
+      }
+    }
+  },
+  initial:function(array) {
+    array.pop()
+    return array
+  },
+  intersection:function(arrays) {
+    return arrays[0].filter(item => {
+      arrays.slice(1).every(arr => arr.includes(item))
+    })
+  },
+  intersectionBy:function(arrays, ...args) {
+    let func;
+    let lastArgs = args[args.length - 1];
+    if (typeof lastArgs === "string" || typeof lastArgs === "function") {
+      func = this.iteratee(args.pop());
+    } else {
+      func = it => it;
+    }
+    return array.filter(item =>
+      args.every(arr => arr.map(func).includes(func(item)))
+    );
+  },
+  intersectionWith: function(...args) {
+    let func = args.pop();
+    return args[0].filter(item =>
+      args.slice(1).every(arr => arr.some(arrVal => func(item, arrVal)))
+    );
+  },
+  join:function(array, separator=',') {
+    return array.reduce((res,item,idx) => {
+      if(idx !== array.length) {
+        return res + separator + item
+      }
+    })
+  },
+  last:function(array) {
+   return array.pop()
+  },
+  
 
 
 
